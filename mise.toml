@@ -1,0 +1,96 @@
+[tasks.dev]
+alias = 'default'
+run = 'pnpm dev'
+
+# run
+[tasks.'run:dev']
+run = 'pnpm exec cap run --no-sync -l --host $(ipconfig getifaddr en0) --port ${PORT:-3000}'
+description = 'Run the app with live reload on a simulator or (android) device. Optional arg: android|ios'
+
+[tasks.'run:ios_physical']
+run = '''
+echo 'Deploying to' $DEVICE_IOS_REAL
+echo 'Live reload:' $(grep -q '"server"' ios/App/App/capacitor.config.json && echo 'yes' || echo 'no')
+xcrun devicectl list devices
+cd ios/App
+xcodebuild \
+  -workspace App.xcworkspace \
+  -scheme App \
+  -configuration Debug \
+  -destination name=$DEVICE_IOS_REAL \
+  -derivedDataPath ../DerivedData/$DEVICE_IOS_REAL | xcpretty
+xcrun devicectl device install app -d $DEVICE_IOS_REAL ../DerivedData/$DEVICE_IOS_REAL/Build/Products/Debug-iphoneos/App.app
+xcrun devicectl device process launch -d $DEVICE_IOS_REAL $BUNDLE_ID
+'''
+
+[tasks.'run:prod']
+depends = ['build:prod']
+run = 'pnpm exec cap run --no-sync'
+description = 'Builds the app then runs it on a simulator or (android) device. Optional arg: android|ios'
+
+# logs
+[tasks.'logs:android']
+run = 'adb logcat -v color --pid=$(adb shell pidof -s $BUNDLE_ID)'
+
+[tasks.'logs:ios']
+run = '''
+PID=$(xcrun simctl spawn booted launchctl list | rg '^(\d+)\s+\d\s+.*'$BUNDLE_ID -or '$1')
+xcrun simctl spawn booted log stream --color auto --process $PID --predicate 'type != "activityCreateEvent" AND NOT subsystem IN {"com.apple.CoreTelephony", "com.apple.UIKit", "com.apple.coreanimation"}'
+'''
+
+# build
+[tasks.'build:prod']
+run = '''
+pnpm --color vite build
+node --no-warnings build.js
+pnpm exec cap copy
+'''
+
+[tasks.'build:android']
+depends = ['build:prod']
+run = '''
+pnpm exec cap build android \
+  --keystorepath $KEY_STORE_PATH \
+  --keystorepass $KEY_STORE_PASS \
+  --keystorealias $KEY_STORE_ALIAS \
+  --keystorealiaspass $KEY_STORE_ALIAS_PASS
+open android/app/build/outputs/bundle/release
+open https://play.google.com/console/u/0/developers/$PLAY_CONSOLE_DEV_ID/app/$PLAY_CONSOLE_APP_ID/releases/overview
+'''
+
+[tasks.'build:ios']
+depends = ['build:prod']
+run = '''
+pnpm exec cap copy ios
+pnpm exec cap build ios
+open ios/App/output
+open -a Transporter
+APP_STORE_ID=$(jq -r .config.app_store_id package.json)
+open https://appstoreconnect.apple.com/apps/$APP_STORE_ID/appstore/listing
+'''
+
+[tasks.'updates:clear_betas']
+description = 'Clears all beta versions on the server'
+run = "ssh $DEPLOY_HOST 'cd /srv/apps/read/__; rm *.zip; truncate -s 0 vers.txt'"
+
+[env]
+DEPLOY_HOST = 'web'
+
+JAVA_HOME = '/Applications/Android Studio.app/Contents/jbr/Contents/Home'
+VITE_HOST = 1
+
+BUNDLE_ID = "{{exec(command='jq -r .config.app_id package.json')}}"
+
+BUILD_NUMBER_ANDROID = 1
+BUILD_NUMBER_IOS = 1
+NATIVE_VERSION = "{{exec(command='jq -r .version package.json | cut -d\".\" -f-2')}}"
+
+DEVICE_IOS_SIM = ''
+DEVICE_IOS_REAL = '' # device name
+DEVICE_ANDROID_SIM = ''
+DEVICE_ANDROID_REAL = ''
+
+KEY_STORE_PATH = ''
+KEY_STORE_PASS = ''
+KEY_STORE_ALIAS = ''
+KEY_STORE_ALIAS_PASS = ''

@@ -1,0 +1,28 @@
+PODS:
+  - Capacitor (6.1.2):
+    - CapacitorCordova
+  - CapacitorCordova (6.1.2)
+  - CapacitorPluginPlaylist (0.6.3):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@6.1.2_@capacitor+core@6.1.2/node_modules/@capacitor/ios`)"
+  - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@6.1.2_@capacitor+core@6.1.2/node_modules/@capacitor/ios`)"
+  - "CapacitorPluginPlaylist (from `../../node_modules/.pnpm/capacitor-plugin-playlist@0.6.3_@capacitor+core@6.1.2/node_modules/capacitor-plugin-playlist`)"
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/.pnpm/@capacitor+ios@6.1.2_@capacitor+core@6.1.2/node_modules/@capacitor/ios"
+  CapacitorCordova:
+    :path: "../../node_modules/.pnpm/@capacitor+ios@6.1.2_@capacitor+core@6.1.2/node_modules/@capacitor/ios"
+  CapacitorPluginPlaylist:
+    :path: "../../node_modules/.pnpm/capacitor-plugin-playlist@0.6.3_@capacitor+core@6.1.2/node_modules/capacitor-plugin-playlist"
+
+SPEC CHECKSUMS:
+  Capacitor: 679f9673fdf30597493a6362a5d5bf233d46abc2
+  CapacitorCordova: f48c89f96c319101cd2f0ce8a2b7449b5fb8b3dd
+  CapacitorPluginPlaylist: 0ca52ecb11809e16e9525ca6ad0335af986599e4
+
+PODFILE CHECKSUM: f3eb3b51276ee6fdbdf29e46550975473af9a8c4
+
+COCOAPODS: 1.15.2
