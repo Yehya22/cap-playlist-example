@@ -17,6 +17,7 @@
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/android": "^6.1.2",
+    "svelte-french-toast": "^1.2.0",
     "@capacitor/ios": "^6.1.2",
     "capacitor-plugin-playlist": "^0.6.3",
     "prettier": "^3.3.3",

@@ -23,6 +23,15 @@ importers:
       capacitor-plugin-playlist:
         specifier: ^0.6.3
         version: 0.6.3(@capacitor/core@6.1.2)
+      prettier:
+        specifier: ^3.3.3
+        version: 3.3.3
+      prettier-plugin-svelte:
+        specifier: ^3.2.6
+        version: 3.2.6(prettier@3.3.3)(svelte@5.0.0-next.216)
+      svelte-french-toast:
+        specifier: ^1.2.0
+        version: 1.2.0(svelte@5.0.0-next.216)
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.1.1
@@ -633,6 +642,17 @@ packages:
     resolution: {integrity: sha512-TesUflQ0WKZqAvg52PWL6kHgLKP6xB6heTOdoYM0Wt2UHyxNa4K25EZZMgKns3BH1RLVbZCREPpLY0rhnNoHVQ==}
     engines: {node: ^10 || ^12 || >=14}
 
+  prettier-plugin-svelte@3.2.6:
+    resolution: {integrity: sha512-Y1XWLw7vXUQQZmgv1JAEiLcErqUniAF2wO7QJsw8BVMvpLET2dI5WpEIEJx1r11iHVdSMzQxivyfrH9On9t2IQ==}
+    peerDependencies:
+      prettier: ^3.0.0
+      svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
+
+  prettier@3.3.3:
+    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
@@ -702,11 +722,21 @@ packages:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
 
+  svelte-french-toast@1.2.0:
+    resolution: {integrity: sha512-5PW+6RFX3xQPbR44CngYAP1Sd9oCq9P2FOox4FZffzJuZI2mHOB7q5gJBVnOiLF5y3moVGZ7u2bYt7+yPAgcEQ==}
+    peerDependencies:
+      svelte: ^3.57.0 || ^4.0.0
+
   svelte-hmr@0.16.0:
     resolution: {integrity: sha512-Gyc7cOS3VJzLlfj7wKS0ZnzDVdv3Pn2IuVeJPk9m2skfhcu5bq3wtIZyQGggr7/Iim5rH5cncyQft/kRLupcnA==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
     peerDependencies:
       svelte: ^3.19.0 || ^4.0.0
+
+  svelte-writable-derived@3.1.1:
+    resolution: {integrity: sha512-w4LR6/bYZEuCs7SGr+M54oipk/UQKtiMadyOhW0PTwAtJ/Ai12QS77sLngEcfBx2q4H8ZBQucc9ktSA5sUGZWw==}
+    peerDependencies:
+      svelte: ^3.2.1 || ^4.0.0-next.1 || ^5.0.0-next.94
 
   svelte@5.0.0-next.216:
     resolution: {integrity: sha512-LS7XBjsG5jfq84unAlMrJmCOvJb0vLUcYyDHP/3viycm0JFyAWamfp0wzounCFOvaaJKS5a0ShCNZRPMxaWsKg==}
@@ -1383,6 +1413,13 @@ snapshots:
       picocolors: 1.0.1
       source-map-js: 1.2.0
 
+  prettier-plugin-svelte@3.2.6(prettier@3.3.3)(svelte@5.0.0-next.216):
+    dependencies:
+      prettier: 3.3.3
+      svelte: 5.0.0-next.216
+
+  prettier@3.3.3: {}
+
   prompts@2.4.2:
     dependencies:
       kleur: 3.0.3
@@ -1462,7 +1499,16 @@ snapshots:
     dependencies:
       ansi-regex: 5.0.1
 
+  svelte-french-toast@1.2.0(svelte@5.0.0-next.216):
+    dependencies:
+      svelte: 5.0.0-next.216
+      svelte-writable-derived: 3.1.1(svelte@5.0.0-next.216)
+
   svelte-hmr@0.16.0(svelte@5.0.0-next.216):
+    dependencies:
+      svelte: 5.0.0-next.216
+
+  svelte-writable-derived@3.1.1(svelte@5.0.0-next.216):
     dependencies:
       svelte: 5.0.0-next.216
 

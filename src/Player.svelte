@@ -1,23 +1,24 @@
-<section class="player-cont">
-    <input
-        type="range"
-        min="0"
-        max={duration || 1}
-        step="any"
-        oninput={e => seek_to(e.target.value)}
-        onclick={window._useragent?.ios
-            ? e => seek_to((e.offsetX / e.target.offsetWidth) * duration)
-            : () => {}}
-        bind:value={seeker_value}
-        style="--bg-size: {(time_passed / (duration || 1)) * 100 || 0}%"
-    />
-    <div class="now-playing">
-        <span class="time-passed">{fmt_time(time_passed)}</span>
-        <PlayButton on:click={() => rmx_player[playing ? 'pause' : 'play']()} {playing} />
-        <span class="time-remaining">-{fmt_time(duration - time_passed)}</span>
+<section class="player-wrapper">
+    <div class="player-cont">
+        <input
+            type="range"
+            min="0"
+            max={duration || 1}
+            step="any"
+            oninput={e => seek_to(e.target.value)}
+            onclick={window._useragent?.ios
+                ? e => seek_to((e.offsetX / e.target.offsetWidth) * duration)
+                : () => {}}
+            bind:value={seeker_value}
+            style="--bg-size: {(time_passed / (duration || 1)) * 100 || 0}%"
+        />
+        <div class="now-playing">
+            <span class="time-passed">{fmt_time(time_passed)}</span>
+            <PlayButton on:click={() => rmx_player[playing ? 'pause' : 'play']()} {playing} />
+            <span class="time-remaining">-{fmt_time(duration - time_passed)}</span>
+        </div>
     </div>
 </section>
-
 <svelte:window
     onkeydown={e => {
         const active_tag = document.activeElement.tagName
@@ -39,18 +40,65 @@ Playlist.setOptions({verbose: false, options: {icon: 'app'}})
 import PlayButton from './PlayButton.svelte'
 import {Capacitor} from '@capacitor/core'
 import {onDestroy, onMount} from 'svelte'
+import toast from 'svelte-french-toast'
 
 const platform = Capacitor.getPlatform()
-let {tracks = [], track_id, positions, timeupdate, on_ended} = $props()
+
+let tracks = $state([
+    {
+        isStream: true,
+        trackId: 1,
+        assetUrl:
+            'https://ia801809.us.archive.org/8/items/homeacre_2408_librivox/homeacre_01_roe_128kb.mp3',
+        title: 'CHAPTER I TREE-PLANTING - Part 1',
+        album: 'CHAPTER I TREE-PLANTING - Part 1',
+    },
+    {
+        isStream: true,
+        trackId: 2,
+        assetUrl:
+            'https://www.archive.org/download/homeacre_2408_librivox/homeacre_02_roe_128kb.mp3',
+        title: 'CHAPTER I TREE-PLANTING - Part 2',
+        album: 'CHAPTER I TREE-PLANTING - Part 2',
+    },
+    // {
+    //     isStream: true,
+    //     trackId: 3,
+    //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_03_roe_128kb.mp3',
+    //     title: 'CHAPTER II FRUIT-TREES AND GRASS – Part 1',
+    //     album: 'CHAPTER II FRUIT-TREES AND GRASS – Part 1',
+    // },
+    // {
+    //     isStream: true,
+    //     trackId: 4,
+    //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_04_roe_128kb.mp3',
+    //     title: 'CHAPTER II FRUIT-TREES AND GRASS – Part 2',
+    //     album: 'CHAPTER II FRUIT-TREES AND GRASS – Part 2',
+    // },
+    // {
+    //     isStream: true,
+    //     trackId: 5,
+    //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_05_roe_128kb.mp3',
+    //     title: 'CHAPTER III THE GARDEN – Part 1',
+    //     album: 'CHAPTER III THE GARDEN – Part 1',
+    // },
+])
+
+let reader_state = {
+    src: 1,
+}
+
+let is_ended = $state(false)
 
 function fmt_time(seconds) {
     const minutes = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
 }
+
 onMount(() => {
     if (tracks.length) {
-        set_tracks(tracks, track_id, positions)
+        set_tracks(tracks, reader_state.src)
     }
 })
 
@@ -58,12 +106,12 @@ let previous_tracks
 let previous_track_id
 
 $effect(() => {
-    if (tracks !== previous_tracks || track_id !== previous_track_id) {
+    if (tracks !== previous_tracks || reader_state.src !== previous_track_id) {
         if (tracks.length) {
-            set_tracks(tracks, track_id)
+            set_tracks(tracks, reader_state.src)
         }
         previous_tracks = tracks
-        previous_track_id = track_id
+        previous_track_id = reader_state.src
     }
 })
 
@@ -79,22 +127,30 @@ function event_cb(data) {
         case RmxAudioStatusMessage.RMXSTATUS_PLAYBACK_POSITION:
             time_passed = value.currentPosition
             seeker_value = value.currentPosition
-            timeupdate(value.currentPosition)
             break
         case RmxAudioStatusMessage.RMXSTATUS_PLAYING:
-            if (platform === 'android') playing = true
+            playing = true
+            toast.success('Playing')
+            console.log('Playing')
             break
         case RmxAudioStatusMessage.RMXSTATUS_DURATION:
-            if (platform === 'android') duration = value.duration
+            duration = value.duration
+            toast.success('Duration updated')
+            console.log('Duration updated')
             break
         case RmxAudioStatusMessage.RMXSTATUS_PAUSE:
-            if (platform === 'android') playing = false
+            playing = false
+            toast.success('Paused')
+            console.log('Paused')
             break
         case RmxAudioStatusMessage.RMXSTATUS_SEEK:
-            console.log('seek')
+            toast.success('Seek')
+            console.log('Seek')
             break
         case RmxAudioStatusMessage.RMXSTATUS_COMPLETED:
-            on_ended()
+            toast.success('Completed')
+            console.log('Completed')
+            ended()
             break
     }
 
@@ -106,12 +162,10 @@ function event_cb(data) {
 }
 rmx_player.on('status', event_cb)
 
-const set_tracks = async (tracks, track_id) => {
+async function set_tracks(tracks, track_id) {
     try {
         await rmx_player.setPlaylistItems($state.snapshot(tracks), {
             playFromId: `${track_id}`,
-            playFromPosition: Math.max(0, positions[track_id] || 0),
-            startPaused: !playing,
         })
     } catch (error) {
         console.error('Error setting playlist items:', error)
@@ -124,6 +178,22 @@ async function seek_to(position) {
     seeker_value = position
 }
 
+function ended() {
+    if (is_ended) return
+    is_ended = true
+    if (reader_state.src === tracks.length) {
+        setTimeout(async () => {
+            reader_state.src = 1
+            await rmx_player.setPlaylistItems($state.snapshot(tracks), {
+                playFromId: `${reader_state.src}`,
+            })
+        }, 100)
+    } else {
+        reader_state.src += 1
+    }
+    is_ended = false
+}
+
 onDestroy(() => {
     rmx_player.off('status', event_cb)
     rmx_player.pause()
@@ -132,8 +202,15 @@ onDestroy(() => {
 </script>
 
 <style>
+.player-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .player-cont {
     direction: ltr;
+    width: 100%;
     padding: 0.5rem;
     box-shadow: 0 2px 1px 0 whitesmoke;
 
