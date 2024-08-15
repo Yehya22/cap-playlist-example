@@ -47,7 +47,7 @@ const platform = Capacitor.getPlatform()
 let tracks = $state([
     {
         isStream: true,
-        trackId: 1,
+        trackId: '1',
         assetUrl:
             'https://ia801809.us.archive.org/8/items/homeacre_2408_librivox/homeacre_01_roe_128kb.mp3',
         title: 'CHAPTER I TREE-PLANTING - Part 1',
@@ -55,7 +55,7 @@ let tracks = $state([
     },
     {
         isStream: true,
-        trackId: 2,
+        trackId: '2',
         assetUrl:
             'https://www.archive.org/download/homeacre_2408_librivox/homeacre_02_roe_128kb.mp3',
         title: 'CHAPTER I TREE-PLANTING - Part 2',
@@ -63,21 +63,21 @@ let tracks = $state([
     },
     // {
     //     isStream: true,
-    //     trackId: 3,
+    //     trackId: '3',
     //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_03_roe_128kb.mp3',
     //     title: 'CHAPTER II FRUIT-TREES AND GRASS – Part 1',
     //     album: 'CHAPTER II FRUIT-TREES AND GRASS – Part 1',
     // },
     // {
     //     isStream: true,
-    //     trackId: 4,
+    //     trackId: '4',
     //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_04_roe_128kb.mp3',
     //     title: 'CHAPTER II FRUIT-TREES AND GRASS – Part 2',
     //     album: 'CHAPTER II FRUIT-TREES AND GRASS – Part 2',
     // },
     // {
     //     isStream: true,
-    //     trackId: 5,
+    //     trackId: '5',
     //     assetUrl:'https://www.archive.org/download/homeacre_2408_librivox/homeacre_05_roe_128kb.mp3',
     //     title: 'CHAPTER III THE GARDEN – Part 1',
     //     album: 'CHAPTER III THE GARDEN – Part 1',
@@ -87,8 +87,6 @@ let tracks = $state([
 let reader_state = {
     src: 1,
 }
-
-let is_ended = $state(false)
 
 function fmt_time(seconds) {
     const minutes = Math.floor(seconds / 60)
@@ -179,19 +177,14 @@ async function seek_to(position) {
 }
 
 function ended() {
-    if (is_ended) return
-    is_ended = true
     if (reader_state.src === tracks.length) {
         setTimeout(async () => {
             reader_state.src = 1
-            await rmx_player.setPlaylistItems($state.snapshot(tracks), {
-                playFromId: `${reader_state.src}`,
-            })
+            await rmx_player.playTrackById(`${reader_state.src}`)
         }, 100)
     } else {
         reader_state.src += 1
     }
-    is_ended = false
 }
 
 onDestroy(() => {

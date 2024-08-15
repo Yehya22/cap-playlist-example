@@ -1,6 +1,6 @@
 <main>
-    <Player />
-    <Toaster containerClassName={Capacitor.getPlatform() === 'ios' ? 'ios-margin-top' : ''} />
+  <Player />
+  <Toaster containerStyle="margin-top: {Capacitor.getPlatform() === 'ios' ? '40px' : '0'}" />
 </main>
 
 <script>
@@ -8,9 +8,3 @@ import {Capacitor} from '@capacitor/core'
 import Player from './Player.svelte'
 import {Toaster} from 'svelte-french-toast'
 </script>
-
-<style>
-.ios-margin-top {
-    margin-top: 30px;
-}
-</style>
